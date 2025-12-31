@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { io } from "socket.io-client";
 import api from "../services/api";
 
@@ -9,136 +9,117 @@ export const useChat = () => useContext(ChatContext);
 
 export const ChatProvider = ({ children }) => {
   const { getToken } = useAuth();
-
+  const { isLoaded, isSignedIn } = useUser(); 
   const [chats, setChats] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
+  
   useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
     let newSocket;
 
     const initSocket = async () => {
-      try {
-        const token = await getToken();
+      const token = await getToken();
+      
+      if (!token) return;
 
-        newSocket = io("http://localhost:5000", {
-          auth: { token },
-        });
+      newSocket = io("http://localhost:5000", {
+        auth: { token },
+      });
 
-        newSocket.on("connect", () => {
-          console.log("✅ Socket connected");
-          setIsConnected(true);
-        });
+      newSocket.on("connect", () => {
+        console.log("Socket connected");
+        setIsConnected(true);
+      });
 
-        newSocket.on("disconnect", () => {
-          console.log("❌ Socket disconnected");
-          setIsConnected(false);
-        });
+      newSocket.on("disconnect", () => {
+        setIsConnected(false);
+      });
 
-        newSocket.on("receive_message", (message) => {
-          console.log("📩 Message received:", message);
-          setMessages((prev) => [...prev, message]);
-        });
+      newSocket.on("receive_message", (message) => {
+        setMessages((prev) => [...prev, message]);
+      });
 
-        setSocket(newSocket);
-      } catch (error) {
-        console.error("Socket init error:", error);
-      }
+      setSocket(newSocket);
     };
 
     initSocket();
 
-    return () => {
-      if (newSocket) {
-        newSocket.disconnect();
-      }
-    };
-  }, [getToken]);
+    return () => newSocket?.disconnect();
+  }, [isLoaded, isSignedIn, getToken]);
+
+  
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    fetchChats();
+  }, [isLoaded, isSignedIn]);
 
   const fetchChats = async () => {
-  try {
-    const token = await getToken();
-    if (!token) return;
+    try {
+      const token = await getToken();
+      if (!token) return;
 
-    const response = await api.get("/chats", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const res = await api.get("/chats", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setChats(response.data);
-  } catch (error) {
-    console.error("Error fetching chats:", error);
-  }
-};
+      setChats(res.data);
+    } catch (err) {
+      console.error("Error fetching chats:", err);
+    }
+  };
 
   const fetchMessages = async (chatId) => {
     try {
       const token = await getToken();
+      if (!token) return;
+
       const res = await api.get(`/messages/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(res.data);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
+    } catch (err) {
+      console.error("Error fetching messages:", err);
     }
   };
 
-  const sendMessage = async (
-    chatId,
-    content,
-    type = "text",
-    mediaUrl = "",
-    fileName = ""
-  ) => {
+  const sendMessage = async (chatId, content) => {
     try {
       const token = await getToken();
+      if (!token) return;
 
       const res = await api.post(
         "/messages",
-        { chatId, content, type, mediaUrl, fileName },
+        { chatId, content },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (socket) {
-        socket.emit("sendMessage", res.data);
-      }
-    } catch (error) {
-      console.error("Error sending message:", error);
+      socket?.emit("sendMessage", res.data);
+    } catch (err) {
+      console.error("Error sending message:", err);
     }
   };
 
   const createChat = async (name, participants, isGroup = false) => {
     try {
       const token = await getToken();
+      if (!token) return;
+
       const res = await api.post(
         "/chats",
         { name, participants, isGroup },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setChats((prev) => [res.data, ...prev]);
       return res.data;
-    } catch (error) {
-      console.error("Error creating chat:", error);
+    } catch (err) {
+      console.error("Error creating chat:", err);
     }
-  };
-
-  const joinChat = (chatId) => {
-    if (socket) {
-      socket.emit("joinChat", chatId);
-    }
-    setCurrentChat(chatId);
-    fetchMessages(chatId);
-  };
-
-  const leaveChat = (chatId) => {
-    if (socket) {
-      socket.emit("leaveChat", chatId);
-    }
-    setCurrentChat(null);
-    setMessages([]);
   };
 
   return (
@@ -152,8 +133,6 @@ export const ChatProvider = ({ children }) => {
         fetchMessages,
         sendMessage,
         createChat,
-        joinChat,
-        leaveChat,
       }}
     >
       {children}

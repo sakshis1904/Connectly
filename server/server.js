@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { createServer } from "http";
+import { clerkMiddleware } from "@clerk/express";
+
 import connectDB from "./config/db.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
@@ -17,6 +19,9 @@ const server = createServer(app);
 
 app.use(cors());
 app.use(express.json());
+
+// 🔥 REQUIRED FOR CLERK
+app.use(clerkMiddleware());
 
 const io = setupSocket(server);
 

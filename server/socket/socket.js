@@ -11,16 +11,16 @@ const setupSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("✅ Socket connected:", socket.id);
+    console.log("Socket connected:", socket.id);
 
     socket.on("joinChat", (chatId) => {
       socket.join(chatId);
-      console.log(`📥 Joined chat ${chatId}`);
+      console.log(`Joined chat ${chatId}`);
     });
 
     socket.on("leaveChat", (chatId) => {
       socket.leave(chatId);
-      console.log(`📤 Left chat ${chatId}`);
+      console.log(`Left chat ${chatId}`);
     });
 
     socket.on("sendMessage", async (data) => {
@@ -41,12 +41,12 @@ const setupSocket = (server) => {
 
         io.to(chatId).emit("receive_message", message);
       } catch (err) {
-        console.error("❌ Socket message error:", err);
+        console.error("Socket message error:", err);
       }
     });
 
     socket.on("disconnect", () => {
-      console.log("❌ Socket disconnected:", socket.id);
+      console.log("Socket disconnected:", socket.id);
     });
   });
 

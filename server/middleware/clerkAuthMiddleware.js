@@ -1,38 +1,32 @@
-import { createClerkClient } from '@clerk/clerk-sdk-node';
-import User from '../models/User.js';
+import { requireAuth, clerkClient } from "@clerk/express";
+import User from "../models/User.js";
 
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+export const protect = [
+  requireAuth(),
+  async (req, res, next) => {
+    try {
+      console.log("AUTH:", req.auth); 
 
-const protect = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' });
+      const clerkUserId = req.auth.userId;
+
+      let user = await User.findOne({ clerkId: clerkUserId });
+
+      if (!user) {
+        const clerkUser = await clerkClient.users.getUser(clerkUserId);
+
+        user = await User.create({
+          clerkId: clerkUserId,
+          name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`,
+          email: clerkUser.emailAddresses[0].emailAddress,
+          avatar: clerkUser.imageUrl,
+        });
+      }
+
+      req.user = user;
+      next();
+    } catch (err) {
+      console.error("Auth error:", err);
+      return res.status(401).json({ message: "Authentication failed" });
     }
-
-    const payload = await clerkClient.verifyToken(token);
-
-    if (!payload) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-
-    let user = await User.findOne({ clerkId: payload.sub });
-    if (!user) {
-      const clerkUser = await clerkClient.users.getUser(payload.sub);
-      user = new User({
-        clerkId: payload.sub,
-        name: `${clerkUser.firstName} ${clerkUser.lastName}`,
-        email: clerkUser.emailAddresses[0].emailAddress,
-        avatar: clerkUser.imageUrl,
-      });
-      await user.save();
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Authentication failed' });
-  }
-};
-
-export { protect };
+  },
+];
