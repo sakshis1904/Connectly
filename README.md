@@ -46,12 +46,12 @@ Make sure you have the following installed:
 - VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 
 ### ▶️ How to Run the Project Locally
-1️. Clone the Repository
+### 1️. Clone the Repository
 
 git clone https://github.com/your-username/connectly.git </br>
 cd connectly
 
-2️. Setup Backend
+### 2️. Setup Backend
 
 cd server </br>
 npm install </br>
@@ -60,9 +60,9 @@ npm start </br>
 
 Backend will run on:
 
-### http://localhost:5000
+ - http://localhost:5000
 
-3️. Setup Frontend
+### 3️. Setup Frontend
 cd client </br>
 npm install </br> 
 npm run dev </br>
@@ -70,4 +70,29 @@ npm run dev </br>
 
 Frontend will run on:
 
-### http://localhost:5173
+- http://localhost:5173
+
+
+### 📸 Screenshots
+
+### 🧪 Testing Checklist
+
+* User can log in using Clerk
+* Chats load correctly
+* Messages appear in real time
+* Messages persist after refresh
+* Works on different screen sizes
+
+### 📌 Real-World Relevance
+
+Inspired by:
+
+* Slack
+* WhatsApp
+* Microsoft Teams
+
+### 👩‍💻 Author
+
+Sakshi Shrivastava  </br>
+Final Year CSE Student  </br>
+Aspiring Full-Stack Developer
