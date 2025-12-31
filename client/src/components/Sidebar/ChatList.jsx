@@ -6,7 +6,6 @@ const ChatList = () => {
   const { user } = useAuth();
 
   const handleCreateChat = async () => {
-    // For demo, create a group chat
     const chatName = prompt('Enter chat name:');
     if (chatName) {
       await createChat(chatName, [], true);

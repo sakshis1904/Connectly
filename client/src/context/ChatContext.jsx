@@ -16,7 +16,6 @@ export const ChatProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // 🔌 SOCKET INITIALIZATION
   useEffect(() => {
     let newSocket;
 
@@ -58,11 +57,10 @@ export const ChatProvider = ({ children }) => {
     };
   }, [getToken]);
 
-  // 📥 FETCH CHATS
   const fetchChats = async () => {
   try {
     const token = await getToken();
-    if (!token) return; // ✅ IMPORTANT
+    if (!token) return;
 
     const response = await api.get("/chats", {
       headers: {
@@ -76,7 +74,6 @@ export const ChatProvider = ({ children }) => {
   }
 };
 
-  // 📥 FETCH MESSAGES
   const fetchMessages = async (chatId) => {
     try {
       const token = await getToken();
@@ -89,7 +86,6 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // 📤 SEND MESSAGE (NO DUPLICATES)
   const sendMessage = async (
     chatId,
     content,
@@ -106,8 +102,6 @@ export const ChatProvider = ({ children }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // ✅ DO NOT push message here
-      // Socket will broadcast it
       if (socket) {
         socket.emit("sendMessage", res.data);
       }
@@ -116,7 +110,6 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // ➕ CREATE CHAT
   const createChat = async (name, participants, isGroup = false) => {
     try {
       const token = await getToken();
@@ -132,7 +125,6 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // 🚪 JOIN CHAT
   const joinChat = (chatId) => {
     if (socket) {
       socket.emit("joinChat", chatId);
@@ -141,7 +133,6 @@ export const ChatProvider = ({ children }) => {
     fetchMessages(chatId);
   };
 
-  // 🚪 LEAVE CHAT
   const leaveChat = (chatId) => {
     if (socket) {
       socket.emit("leaveChat", chatId);

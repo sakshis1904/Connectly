@@ -1,9 +1,9 @@
 import Chat from "../models/Chat.js";
+import User from "../models/User.js";
 
-// GET /api/chats
 export const getChats = async (req, res) => {
   try {
-    const userId = req.user._id; // ✅ Our middleware
+    const userId = req.user._id;
 
     const chats = await Chat.find({
       users: userId,
@@ -14,26 +14,17 @@ export const getChats = async (req, res) => {
 
     res.json(chats);
   } catch (error) {
-  console.error("🔥 CHAT CONTROLLER ERROR 🔥");
-  console.error(error);              // FULL ERROR OBJECT
-  console.error(error.message);      // MESSAGE
-  console.error(error.stack);        // STACK TRACE
-
-  res.status(500).json({
-    message: error.message,
-  });
-}
-
-
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
-// POST /api/chats
 export const createChat = async (req, res) => {
   try {
-    const userId = req.user._id; // ✅ Our middleware
+    const userId = req.user._id;
     const { name, participants, isGroup } = req.body;
 
-    // Convert clerkIds to MongoDB _ids
     const participantUsers = await User.find({ clerkId: { $in: participants } });
     const participantIds = participantUsers.map(user => user._id);
 
@@ -47,16 +38,9 @@ export const createChat = async (req, res) => {
 
     res.status(201).json(chat);
   } catch (error) {
-  console.error("🔥 CHAT CONTROLLER ERROR 🔥");
-  console.error(error);              // FULL ERROR OBJECT
-  console.error(error.message);      // MESSAGE
-  console.error(error.stack);        // STACK TRACE
-
-  res.status(500).json({
-    message: error.message,
-  });
-}
-
-
-
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
+

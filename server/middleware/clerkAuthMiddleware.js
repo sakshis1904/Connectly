@@ -16,10 +16,8 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid token' });
     }
 
-    // Find or create user
     let user = await User.findOne({ clerkId: payload.sub });
     if (!user) {
-      // Get user info from Clerk
       const clerkUser = await clerkClient.users.getUser(payload.sub);
       user = new User({
         clerkId: payload.sub,

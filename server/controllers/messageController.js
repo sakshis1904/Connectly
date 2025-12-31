@@ -9,7 +9,7 @@ export const getMessages = async (req, res) => {
 
     res.json(messages);
   }catch (error) {
-  console.error("🔥 MESSAGE CONTROLLER ERROR 🔥");
+  console.error("MESSAGE CONTROLLER ERROR");
   console.error(error);
   console.error(error.message);
   console.error(error.stack);
@@ -24,7 +24,7 @@ export const getMessages = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    const userId = req.auth.userId; // ✅ Clerk
+    const userId = req.auth.userId;
     const { chatId, content } = req.body;
 
     const message = await Message.create({
@@ -39,7 +39,7 @@ export const sendMessage = async (req, res) => {
 
     res.status(201).json(message);
   } catch (error) {
-  console.error("🔥 MESSAGE CONTROLLER ERROR 🔥");
+  console.error("MESSAGE CONTROLLER ERROR");
   console.error(error);
   console.error(error.message);
   console.error(error.stack);

@@ -9,13 +9,11 @@ const ChatPage = () => {
   const { user, isLoaded } = useUser();
 
   useEffect(() => {
-    // ✅ Only fetch chats AFTER Clerk is fully loaded
     if (isLoaded && user) {
       fetchChats();
     }
   }, [isLoaded, user, fetchChats]);
 
-  // Optional: loading state
   if (!isLoaded) {
     return <div className="loading">Loading...</div>;
   }
