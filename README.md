@@ -76,9 +76,9 @@ Frontend will run on:
 ### 📸 Screenshots
 <img width="1600" height="845" alt="image" src="https://github.com/user-attachments/assets/10049a73-81c9-4f17-8d11-bfc8b24d8659" /> </br>
 
-<img width="1597" height="851" alt="image" src="https://github.com/user-attachments/assets/e2120407-7b2e-40c2-9d2c-4da5eb82305e" /> </br>
-
 <img width="1600" height="851" alt="image" src="https://github.com/user-attachments/assets/273d5919-b64c-4598-b68d-48a7459f2399" /> </br>
+
+<img width="1597" height="851" alt="image" src="https://github.com/user-attachments/assets/e2120407-7b2e-40c2-9d2c-4da5eb82305e" /> </br>
 
 ### 🧪 Testing Checklist
 
