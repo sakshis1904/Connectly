@@ -100,4 +100,5 @@ Inspired by:
 
 Sakshi Shrivastava  </br>
 Final Year CSE Student  </br>
-Aspiring Full-Stack Developer
+Aspiring Full-Stack Developer </br>
+sakshishrivastava190304@gmail.com
